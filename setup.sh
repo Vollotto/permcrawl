@@ -2,4 +2,7 @@
 
 git submodule init;
 git submodule update;
-touch ./AnalysisUtils/AndroguardProject/androguard/__init__.py
+cd ./AnalysisUtils/AndroguardProject/androguard/
+git checkout v2.0
+
+touch __init__.py

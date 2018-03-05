@@ -1,3 +1,6 @@
 [submodule "tools/androguard"]
 	path = tools/androguard
 	url = git@github.com:androguard/androguard.git
+[submodule "AnalysisUtils/AndroguardProject/androguard"]
+	path = AnalysisUtils/AndroguardProject/androguard
+	url = git@github.com:androguard/androguard.git
