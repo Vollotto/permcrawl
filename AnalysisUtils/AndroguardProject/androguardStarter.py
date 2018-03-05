@@ -1,5 +1,5 @@
 from androguard.androguard.misc import AnalyzeAPK
 
-def invokeAndroguard(path):
+def invoke_androguard(path):
     a, d, dx = AnalyzeAPK(path)
     return a, d, dx
