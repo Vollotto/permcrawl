@@ -1,0 +1,298 @@
+{
+ "android.permission.READ_CONTACTS" :
+ {
+   "type" : "r",
+   "uri" :
+           [
+             "ContactsContract.AUTHORITY_URI",
+             "ContactsContract.CONTENT_URI",
+             "ContactsContract.ENTERPRISE_CONTENT_URI",
+             "ContactsContract.ENTERPRISE_FILE_URI",
+             "ContactsContract$AggregationExceptions.CONTENT_URI",
+             "ContactsContract$CommonDataKinds$Callable.CONTENT_URI",
+             "ContactsContract$CommonDataKinds$Callable.CONTENT_FILTER_URI",
+             "ContactsContract$CommonDataKinds$Callable.ENTERPRISE_CONTENT_FILTER_URI",
+             "ContactsContract$CommonDataKinds$Contactables.CONTENT_URI",
+             "ContactsContract$CommonDataKinds$Contactables.CONTENT_FILTER_URI",
+             "ContactsContract$CommonDataKinds$Email.CONTENT_URI",
+             "ContactsContract$CommonDataKinds$Email.CONTENT_FILTER_URI",
+             "ContactsContract$CommonDataKinds$Email.CONTENT_LOOKUP_URI",
+             "ContactsContract$CommonDataKinds$Email.ENTERPRISE_CONTENT_FILTER_URI",
+             "ContactsContract$CommonDataKinds$Email.ENTERPRISE_CONTENT_LOOKUP_URI",
+             "ContactsContract$CommonDataKinds$Phone.CONTENT_URI",
+             "ContactsContract$CommonDataKinds$Phone.CONTENT_FILTER_URI",
+             "ContactsContract$CommonDataKinds$Phone.ENTERPRISE_CONTENT_FILTER_URI",
+             "ContactsContract$Contacts.CONTENT_FILTER_URI",
+             "ContactsContract$Contacts.CONTENT_FREQUENT_URI",
+             "ContactsContract$Contacts.CONTENT_GROUP_URI",
+             "ContactsContract$Contacts.CONTENT_LOOKUP_URI",
+             "ContactsContract$Contacts.CONTENT_MULTI_VCARD_URI",
+             "ContactsContract$Contacts.CONTENT_STREQUENT_FILTER_URI",
+             "ContactsContract$Contacts.CONTENT_STREQUENT_URI",
+             "ContactsContract$Contacts.CONTENT_URI",
+             "ContactsContract$Contacts.CONTENT_VCARD_URI",
+             "ContactsContract$Contacts.ENTERPRISE_CONTENT_FILTER_URI",
+             "ContactsContract$Data.CONTENT_URI",
+             "ContactsContract$DataUsageFeedback.DELETE_USAGE_URI",
+             "ContactsContract$DataUsageFeedback.FEEDBACK_URI",
+             "ContactsContract$DeletedContacts.CONTENT_URI",
+             "ContactsContract$Directory.CONTENT_URI",
+             "ContactsContract$Directory.ENTERPRISE_CONTENT_URI",
+             "ContactsContract$DisplayPhoto.CONTENT_MAX_DIMENSIONS_URI",
+             "ContactsContract$DisplayPhoto.CONTENT_URI",
+             "ContactsContract$Groups.CONTENT_SUMMARY_URI",
+             "ContactsContract$Groups.CONTENT_URI",
+             "ContactsContract$PhoneLookup.CONTENT_FILTER_URI",
+             "ContactsContract$PhoneLookup.ENTERPRISE_CONTENT_FILTER_URI",
+             "ContactsContract$Profile.CONTENT_URI",
+             "ContactsContract$Profile.CONTENT_RAW_CONTACTS_URI",
+             "ContactsContract$Profile.CONTENT_VCARD_URI",
+             "ContactsContract$ProfileSyncState.CONTENT_URI",
+             "ContactsContract$ProviderStatus.CONTENT_URI",
+             "ContactsContract$RawContacts.CONTENT_URI",
+             "ContactsContract$RawContactsEntity.CONTENT_URI",
+             "ContactsContract$RawContactsEntity.PROFILE_CONTENT_URI",
+             "ContactsContract$Settings.CONTENT_URI",
+             "ContactsContract$StatusUpdates.CONTENT_URI",
+             "ContactsContract$StatusUpdates.PROFILE_CONTENT_URI",
+             "ContactsContract$SyncState.CONTENT_URI",
+             "com.android.exchange.directory.provider",
+             "icc",
+             "contacts",
+             "com.android.contacts"
+           ]
+ },
+ "android.permission.WRITE_CONTACTS" :
+ {
+   "type" : "w",
+   "uri" :
+            [
+             "ContactsContract.AUTHORITY_URI",
+             "ContactsContract.CONTENT_URI",
+             "ContactsContract.ENTERPRISE_CONTENT_URI",
+             "ContactsContract.ENTERPRISE_FILE_URI",
+             "ContactsContract$AggregationExceptions.CONTENT_URI",
+             "ContactsContract$CommonDataKinds$Callable.CONTENT_URI",
+             "ContactsContract$CommonDataKinds$Callable.CONTENT_FILTER_URI",
+             "ContactsContract$CommonDataKinds$Callable.ENTERPRISE_CONTENT_FILTER_URI",
+             "ContactsContract$CommonDataKinds$Contactables.CONTENT_URI",
+             "ContactsContract$CommonDataKinds$Contactables.CONTENT_FILTER_URI",
+             "ContactsContract$CommonDataKinds$Email.CONTENT_URI",
+             "ContactsContract$CommonDataKinds$Email.CONTENT_FILTER_URI",
+             "ContactsContract$CommonDataKinds$Email.CONTENT_LOOKUP_URI",
+             "ContactsContract$CommonDataKinds$Email.ENTERPRISE_CONTENT_FILTER_URI",
+             "ContactsContract$CommonDataKinds$Email.ENTERPRISE_CONTENT_LOOKUP_URI",
+             "ContactsContract$CommonDataKinds$Phone.CONTENT_URI",
+             "ContactsContract$CommonDataKinds$Phone.CONTENT_FILTER_URI",
+             "ContactsContract$CommonDataKinds$Phone.ENTERPRISE_CONTENT_FILTER_URI",
+             "ContactsContract$Contacts.CONTENT_FILTER_URI",
+             "ContactsContract$Contacts.CONTENT_FREQUENT_URI",
+             "ContactsContract$Contacts.CONTENT_GROUP_URI",
+             "ContactsContract$Contacts.CONTENT_LOOKUP_URI",
+             "ContactsContract$Contacts.CONTENT_MULTI_VCARD_URI",
+             "ContactsContract$Contacts.CONTENT_STREQUENT_FILTER_URI",
+             "ContactsContract$Contacts.CONTENT_STREQUENT_URI",
+             "ContactsContract$Contacts.CONTENT_URI",
+             "ContactsContract$Contacts.CONTENT_VCARD_URI",
+             "ContactsContract$Contacts.ENTERPRISE_CONTENT_FILTER_URI",
+             "ContactsContract$Data.CONTENT_URI",
+             "ContactsContract$DataUsageFeedback.DELETE_USAGE_URI",
+             "ContactsContract$DataUsageFeedback.FEEDBACK_URI",
+             "ContactsContract$DeletedContacts.CONTENT_URI",
+             "ContactsContract$Directory.CONTENT_URI",
+             "ContactsContract$Directory.ENTERPRISE_CONTENT_URI",
+             "ContactsContract$DisplayPhoto.CONTENT_MAX_DIMENSIONS_URI",
+             "ContactsContract$DisplayPhoto.CONTENT_URI",
+             "ContactsContract$Groups.CONTENT_SUMMARY_URI",
+             "ContactsContract$Groups.CONTENT_URI",
+             "ContactsContract$PhoneLookup.CONTENT_FILTER_URI",
+             "ContactsContract$PhoneLookup.ENTERPRISE_CONTENT_FILTER_URI",
+             "ContactsContract$Profile.CONTENT_URI",
+             "ContactsContract$Profile.CONTENT_RAW_CONTACTS_URI",
+             "ContactsContract$Profile.CONTENT_VCARD_URI",
+             "ContactsContract$ProfileSyncState.CONTENT_URI",
+             "ContactsContract$ProviderStatus.CONTENT_URI",
+             "ContactsContract$RawContacts.CONTENT_URI",
+             "ContactsContract$RawContactsEntity.CONTENT_URI",
+             "ContactsContract$RawContactsEntity.PROFILE_CONTENT_URI",
+             "ContactsContract$Settings.CONTENT_URI",
+             "ContactsContract$StatusUpdates.CONTENT_URI",
+             "ContactsContract$StatusUpdates.PROFILE_CONTENT_URI",
+             "ContactsContract$SyncState.CONTENT_URI",
+             "com.android.exchange.directory.provider",
+             "icc",
+             "contacts",
+             "com.android.contacts"
+            ]
+ },
+ "android.permission.READ_CALENDAR" :
+ {
+   "type" : "r",
+   "uri" :
+            [
+              "CalendarContract.CONTENT_URI",
+              "CalendarContract$Attendees.CONTENT_URI",
+              "CalendarContract$CalendarAlerts.CONTENT_URI",
+              "CalendarContract$CalendarAlerts.CONTENT_URI_BY_INSTANCE",
+              "CalendarContract$CalendarCache.URI",
+              "CalendarContract$CalendarEntity.CONTENT_URI",
+              "CalendarContract$Calendars.CONTENT_URI",
+              "CalendarContract$Colors.CONTENT_URI",
+              "CalendarContract$EventDays.CONTENT_URI",
+              "CalendarContract$Events.CONTENT_URI",
+              "CalendarContract$Events.CONTENT_EXCEPTION_URI",
+              "CalendarContract$EventsEntity.CONTENT_URI",
+              "CalendarContract$ExtendedProperties.CONTENT_URI",
+              "CalendarContract$Instances.CONTENT_URI",
+              "CalendarContract$Instances.CONTENT_SEARCH_BY_DAY_URI",
+              "CalendarContract$Instances.CONTENT_BY_DAY_URI",
+              "CalendarContract$Instances.CONTENT_SEARCH_URI",
+              "CalendarContract$Reminders.CONTENT_URI",
+              "CalendarContract$SyncState.CONTENT_URI",
+              "com.android.calendar"
+            ]
+ },
+ "android.permission.WRITE_CALENDAR" :
+ {
+   "type" : "w",
+   "uri" :
+            [
+              "CalendarContract.CONTENT_URI",
+              "CalendarContract$Attendees.CONTENT_URI",
+              "CalendarContract$CalendarAlerts.CONTENT_URI",
+              "CalendarContract$CalendarAlerts.CONTENT_URI_BY_INSTANCE",
+              "CalendarContract$CalendarCache.URI",
+              "CalendarContract$CalendarEntity.CONTENT_URI",
+              "CalendarContract$Calendars.CONTENT_URI",
+              "CalendarContract$Colors.CONTENT_URI",
+              "CalendarContract$EventDays.CONTENT_URI",
+              "CalendarContract$Events.CONTENT_URI",
+              "CalendarContract$Events.CONTENT_EXCEPTION_URI",
+              "CalendarContract$EventsEntity.CONTENT_URI",
+              "CalendarContract$ExtendedProperties.CONTENT_URI",
+              "CalendarContract$Instances.CONTENT_URI",
+              "CalendarContract$Instances.CONTENT_SEARCH_BY_DAY_URI",
+              "CalendarContract$Instances.CONTENT_BY_DAY_URI",
+              "CalendarContract$Instances.CONTENT_SEARCH_URI",
+              "CalendarContract$Reminders.CONTENT_URI",
+              "CalendarContract$SyncState.CONTENT_URI",
+              "com.android.calendar"
+            ]
+ },
+  "android.permission.READ_CELL_BROADCASTS" :
+  {
+    "type" : "r",
+    "uri" :
+            [
+              "cellbroadcasts"
+            ]
+  },
+  "com.android.email.permission.READ_ATTACHMENT" :
+  {
+    "type" : "r",
+    "uri" :
+            [
+              "AttachmentProvider.CONTENT_URI",
+              "com.android.email.attachmentprovider"
+            ]
+  },
+  "android.permission.READ_CALL_LOG" :
+  {
+    "type" : "r",
+    "uri" :
+            [
+              "call_log",
+              "CallLog.CONTENT_URI",
+              "CallLog$Calls.CONTENT_URI",
+              "CallLog$Calls.CONTENT_URI_FILTER",
+              "CallLog$Calls.CONTENT_URI_WITH_VOICEMAIL"
+            ]
+  },
+  "android.permission.WRITE_CALL_LOG" :
+  {
+    "type" : "w",
+    "uri" :
+            [
+              "call_log",
+              "CallLog.CONTENT_URI",
+              "CallLog$Calls.CONTENT_URI",
+              "CallLog$Calls.CONTENT_URI_FILTER",
+              "CallLog$Calls.CONTENT_URI_WITH_VOICEMAIL"
+            ]
+  },
+  "com.android.voicemail.permission.ADD_VOICEMAIL" :
+  {
+    "type" : "rw",
+    "uri" :
+            [
+              "com.android.voicemail",
+              "VoicemailContract$Status.CONTENT_URI",
+              "VoicemailContract$Voicemail.CONTENT_URI"
+            ]
+  },
+  "android.permission.READ_EXTERNAL_STORAGE" :
+  {
+    "type" : "r",
+    "uri" :
+            [
+              "media",
+              "MediaStore$Audio$Albums.EXTERNAL_CONTENT_URI",
+              "MediaStore$Audio$Artists.EXTERNAL_CONTENT_URI",
+              "MediaStore$Audio$Genres.EXTERNAL_CONTENT_URI",
+              "MediaStore$Audio$Media.EXTERNAL_CONTENT_URI",
+              "MediaStore$Audio$Playlists.EXTERNAL_CONTENT_URI",
+              "MediaStore$Images$Media.EXTERNAL_CONTENT_URI",
+              "MediaStore$Images$Media$Thumbnails.EXTERNAL_CONTENT_URI",
+              "MediaStore$Video$Media.EXTERNAL_CONTENT_URI",
+              "MediaStore$Video$Media$Thumbnails.EXTERNAL_CONTENT_URI"
+            ]
+  },
+  "android.permission.WRITE_EXTERNAL_STORAGE" :
+  {
+    "type" : "w",
+    "uri" :
+            [
+              "media",
+              "MediaStore$Audio$Albums.EXTERNAL_CONTENT_URI",
+              "MediaStore$Audio$Artists.EXTERNAL_CONTENT_URI",
+              "MediaStore$Audio$Genres.EXTERNAL_CONTENT_URI",
+              "MediaStore$Audio$Media.EXTERNAL_CONTENT_URI",
+              "MediaStore$Audio$Playlists.EXTERNAL_CONTENT_URI",
+              "MediaStore$Images$Media.EXTERNAL_CONTENT_URI",
+              "MediaStore$Images$Media$Thumbnails.EXTERNAL_CONTENT_URI",
+              "MediaStore$Video$Media.EXTERNAL_CONTENT_URI",
+              "MediaStore$Video$Media$Thumbnails.EXTERNAL_CONTENT_URI"
+            ]
+  },
+  "android.permission.READ_SMS" : {
+    "type" : "r",
+    "uri" :
+            [
+              "mms",
+              "mms-sms",
+              "sms",
+              "Telephony$Mms.CONTENT_URI",
+              "Telephony$Mms.REPORT_REQUEST_URI",
+              "Telephony$Mms.REPORT_STATUS_URI",
+              "Telephony$Mms.CONTENT_URI",
+              "Telephony$Mms$Inbox.CONTENT_URI",
+              "Telephony$Mms$Outbox.CONTENT_URI",
+              "Telephony$Mms$Rate.CONTENT_URI",
+              "Telephony$Mms$Sent.CONTENT_URI",
+              "Telephony$MmsSms.CONTENT_CONVERSATIONS_URI",
+              "Telephony$MmsSms.CONTENT_DRAFT_URI",
+              "Telephony$MmsSms.CONTENT_FILTER_BYPHONE_URI",
+              "Telephony$MmsSms.CONTENT_LOCKED_URI",
+              "Telephony$MmsSms.CONTENT_UNDELIVERED_URI",
+              "Telephony$MmsSms.CONTENT_URI",
+              "Telephony$MmsSms.SEARCH_URI",
+              "Telephony$MmsSms$PendingMessages.CONTENT_URI",
+              "Telephony$Sms.CONTENT_URI",
+              "Telephony$Sms$Sent.CONTENT_URI",
+              "Telephony$Sms$Outbox.CONTENT_URI",
+              "Telephony$Sms$Inbox.CONTENT_URI",
+              "Telephony$Sms$Draft.CONTENT_URI",
+              "Telephony$Sms$Conversations.CONTENT_URI"
+            ]
+  }
+}

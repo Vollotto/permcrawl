@@ -1,0 +1,9 @@
+out/*
+out
+AnalysisUtils/ansatz
+.git
+.idea
+AnalysisUtils/__pycache__/*
+AnalysisUtils/__pycache__
+*.pyc
+test.txt

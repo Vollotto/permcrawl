@@ -1,32 +1,15 @@
 import argparse
 from AnalysisUtils.AndroguardProject.androguardStarter import invoke_androguard
 from AnalysisUtils.filter import *
-
-class AnalyzedApk:
-    '''
-        Represents an App which has been analyzed for permission requests and their usages
-    '''
-
-    def __init__(self):
-
-        self.app_name = ""
-        self.package_name = ""
-
-        # Defaults make app not analyzable
-        self.target_sdk = 0
-        self.target_sdk_too_low = True
-        self.no_permission_declared = True
-        # Only Error is set to true by default since submodules set it to true if they face an error
-        self.error = False
-
-        self.requested_permissions_from_manifest = []
-
-
-    def isAnalyzable(self):
-        return not (self.target_sdk_too_low or self.no_permission_declared or self.error)
+from AnalysisUtils.request_analysis import *
+from AnalysisUtils.usage_analysis import *
+from AnalysisUtils.analysis_result import AnalyzedApk
+from androguard.core.analysis.analysis import Analysis
 
 
 def analyze(path_to_apk):
+
+    logging.info("Starting analysis...")
 
     a, d, dx = invoke_androguard(path_to_apk)
 
@@ -38,24 +21,77 @@ def analyze(path_to_apk):
 
     app_to_analyze = filter_manifest_permission_requests(a, app_to_analyze)
 
-    if app_to_analyze.isAnalyzable():
-        print "App %s:%s is analyzable" % (app_to_analyze.package_name, app_to_analyze.app_name)
+    if app_to_analyze.error:
+        logging.critical("Error during extraction of basic infos, maybe the app is obfuscated!")
+        exit(42)
 
-        print "%s targets SDK Level %d" % (app_to_analyze.app_name, app_to_analyze.target_sdk)
+    if not app_to_analyze.is_analyzable():
+        logging.error("App is not analyzable, skipping request and usage analysis")
+        return app_to_analyze
 
-        print "%s requests the following permissions:" % app_to_analyze.app_name
+    # Prepare analysis instance
+    analysis = Analysis()
 
-        for permission in app_to_analyze.requested_permissions_from_manifest:
-            print permission
+    for vm in d:
+        analysis.add(vm)
+
+    logging.info("Creating XREFs...")
+    analysis.create_xref()
+
+    app_to_analyze = run_request_analysis(app_to_analyze, analysis, a.get_main_activity().replace(".","/"))
+
+    try:
+        app_to_analyze = run_usage_analysis(app_to_analyze, analysis)
+    except Exception as e:
+        logging.critical("Exception during UsageAnalysis:\n%s" % str(e))
+        exit(43)
+
+    logging.info("Finished analysis...")
+
+    return app_to_analyze
+
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="Test permission analysis")
 
-    parser.add_argument("-i", "--input",
+    parser.add_argument("-apk", "--input",
                         required=True, help="Path to apk file")
+
+    parser.add_argument("-p", "--print",
+                        action='store_true', help="Activate printing the analysis result to stdout")
+
+    parser.add_argument("-d", "--debug",
+                        action='store_true', help='Activate debug messages')
+
+    parser.add_argument("-i", "--info",
+                        action='store_true', help='Activate info messages')
+
+    parser.add_argument("-j", "--json",
+                        action='store_true', help='Export the collected data into json format')
+
     args = parser.parse_args()
 
-    analyze(args.input)
+    logging.basicConfig(level=logging.WARNING, format='%(asctime)s - %(levelname)s - %(message)s')
+
+    logger = logging.getLogger()
+
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+    elif args.info:
+        logger.setLevel(logging.INFO)
+
+    apk = analyze(args.input)
+
+    if args.print:
+        print(repr(apk))
+
+    if args.json:
+        try:
+            with open("./out/" + apk.package_name.replace(".", "_") + apk.app_name + ".json", "w") as out:
+                out.write(apk.to_json())
+        except IOError:
+            logging.critical("Error when writing to json file!")
+            exit(44)
 
     exit(0)
