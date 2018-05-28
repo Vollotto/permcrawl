@@ -179,7 +179,7 @@ class RequestAnalysis:
         json_out += "\t" * tab + "\t],\n"
 
         # Finally append the explanation
-        json_out += "\t" * tab + "\t\"explanation\" : \"%s\"" % json.dumps(self.explanation)
+        json_out += "\t" * tab + "\t\"explanation\" : %s" % json.dumps(self.explanation)
 
         json_out += "\t" * tab + "}"
 
