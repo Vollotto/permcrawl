@@ -88,7 +88,9 @@ if __name__ == '__main__':
 
     if args.json:
         try:
-            with open("./out/" + apk.package_name.replace(".", "_") + apk.app_name + ".json", "w") as out:
+            with open(os.path.dirname(os.path.realpath(sys.argv[0]))
+                              + "/out/" + apk.package_name.replace(".", "_")
+                              + apk.app_name + ".json", "w") as out:
                 out.write(apk.to_json())
         except IOError:
             logging.critical("Error when writing to json file!")

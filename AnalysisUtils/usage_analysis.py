@@ -6,6 +6,8 @@ from .analysis_result import AnalyzedApk
 from .UsageAnalysisResult import UsageAnalysis
 import json
 import logging
+import sys
+import os
 
 
 def backtrace_usage(analysis, usage, visited_xrefs=[]):
@@ -204,23 +206,26 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
 def run_usage_analysis(apk, analysis):
     # type: (AnalyzedApk, Analysis) -> AnalyzedApk
 
+    # Get base path of permcrawl.py for loading the json files
+    base_path = os.path.dirname(os.path.realpath(sys.argv[0]))
+
     # Load the permission-sdk-map and the permission-framework map from the resp. json files as dicts
 
-    with open("/home/jannik/Thesis_New/permcrawl/AnalysisUtils/"
+    with open(base_path + "/AnalysisUtils/"
               "API_Res/perm-sdk-map-api" + str(apk.target_sdk) + ".json") as sdk_dict:
         perm_sdk_map = json.load(sdk_dict)
 
     if not perm_sdk_map:
         raise Exception("Could not load the permission-sdk mapping for API " + str(apk.target_sdk))
 
-    with open("/home/jannik/Thesis_New/permcrawl/AnalysisUtils/API_Res/perm-framework-map-api" + str(
+    with open(base_path + "/AnalysisUtils/API_Res/perm-framework-map-api" + str(
             apk.target_sdk) + ".json") as framework_dict:
         perm_framework_map = json.load(framework_dict)
 
     if not perm_framework_map:
         raise Exception("Could not load the permission-framework mapping for API " + str(apk.target_sdk))
 
-    with open("/home/jannik/Thesis_New/permcrawl/AnalysisUtils/API_Res/ContentProvider/perm-provider-map23.json") \
+    with open(base_path + "/AnalysisUtils/API_Res/ContentProvider/perm-provider-map23.json") \
             as provider_dict:
         perm_provider_map = json.load(provider_dict)
 
