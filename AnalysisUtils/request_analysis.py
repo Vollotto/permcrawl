@@ -16,7 +16,7 @@ def backtrace_request(analysis, request, main_activity, visited_xrefs=[]):
         # this is a cycle... abort
         return []
     elif main_activity in request.get_method().get_class_name():
-        # succesfully backtraced path to permission request
+        # successfully backtraced path to permission request
         logging.info("Found MainActivity")
         return [request.get_method()]
     else:
@@ -40,6 +40,7 @@ def backtrace_request(analysis, request, main_activity, visited_xrefs=[]):
     return []
 
 
+# deprecated
 def find_explanation(apk, analysis, request):
     # type: (APK, Analysis, RequestAnalysis) -> str
 
@@ -76,6 +77,46 @@ def find_explanation(apk, analysis, request):
                 return str_resources[id]
 
     return ""
+
+
+def find_possible_explanations(apk, analysis, request):
+    # type: (APK, Analysis, RequestAnalysis) -> List[str]
+
+    logging.info("Searching possible explanations...")
+    logging.info("Searching in code...")
+
+    possible_explanations = []
+
+    # Maybe we have an explanation string directly in the code (constant, hardcoded,...)
+    for str_analysis in analysis.get_strings():
+        # We need the String to be used in the same method that calls our permission
+        for (classobj, methodobj) in str_analysis.get_xref_from():
+            # Also we need to check whether the String is really an explanation
+            if methodobj == request.caller and is_explanation(str_analysis.get_value()):
+                logging.info("String analysis object in requesting method: \n%s" % repr(str_analysis))
+                possible_explanations.append(str_analysis.get_value())
+
+    logging.info("Searching used string resources...")
+    # Maybe there is a string ressource used as explanation
+    # We can find them by searching for resource ids that are used in the method that requests the permission
+    res_id = re.compile("\d{10}")
+    ids_in_code = res_id.findall(request.caller.get_source())
+    logging.info("Found IDs: %s" % ids_in_code)
+
+    # Take all string resources from the APK
+    str_resources = apk.get_android_resources().get_resolved_strings()[apk.get_package()]['DEFAULT']
+    logging.info("Resolved Strings: %s" % str_resources)
+
+    for id in ids_in_code:
+        id = int(id)
+        # Check if the id belongs to a resolved string resource
+        if id in str_resources.keys():
+            logging.info("Checking resolved String resource...\n%s" % str_resources[id])
+            # Now check if the string is an explanation why a permission is needed
+            if is_explanation(str_resources[id]):
+                possible_explanations.append(str_resources[id])
+
+    return possible_explanations
 
 
 def analyze_requests(analysis, requested_permissions, main_activity):
@@ -171,13 +212,15 @@ def analyze_requests(analysis, requested_permissions, main_activity):
 
     return analyzed_requests
 
+
 def analyze_explanations(analyzed_apk, apk, analysis):
     # type: (AnalyzedApk, APK ,Analysis) -> AnalyzedApk
 
     for req in analyzed_apk.analyzed_requests:
-        req.explanation = find_explanation(apk, analysis, req)
+        req.explanation = find_possible_explanations(apk, analysis, req)
 
     return analyzed_apk
+
 
 def run_request_analysis(analyzed_apk, apk, analysis, main_activity):
     # type: (AnalyzedApk, APK ,Analysis, str) -> AnalyzedApk

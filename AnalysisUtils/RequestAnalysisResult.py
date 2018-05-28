@@ -18,7 +18,7 @@ class RequestAnalysis:
 
         self.path = path
 
-        self.explanation = ""
+        self.explanation = []
 
         return
 
@@ -97,10 +97,9 @@ class RequestAnalysis:
                     # use the count value to keep track of the order
                     path[method_info["count"]] = node
 
-
         req = cls(permission=perm, method=method, caller=caller, reason=reason, path=path)
 
-        req.explanation = req_analysis_json["explanation"].replace("\\\"", "\"").replace("\\n", "\n")
+        req.explanation = json.loads(req_analysis_json["explanation"])
 
         return req
 
@@ -130,7 +129,7 @@ class RequestAnalysis:
             out += "Could not backtrace the permission request to MainActivity.\n"
 
         if self.explanation:
-            out += "Found explanation for the permission request:\n%s" % self.explanation
+            out += "Found explanation for the permission request:\n%s\n" % self.explanation
         else:
             out += "No explanation for the permission request found.\n"
 
