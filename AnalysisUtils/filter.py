@@ -33,6 +33,8 @@ def filter_target_sdk(apk, analyzed_apk):
         # Target SDK version should be greater than 23 (Marshmallow)
         # since Marshmallow introduced dynamic permission requests
         if analyzed_apk.target_sdk > 23:
+            if analyzed_apk.target_sdk > 25:
+                analyzed_apk.target_sdk = 25
             analyzed_apk.target_sdk_too_low = False
         else:
             logging.warning("Illegal target SDK version")

@@ -38,7 +38,7 @@ def analyze(path_to_apk):
     logging.info("Creating XREFs...")
     analysis.create_xref()
 
-    app_to_analyze = run_request_analysis(app_to_analyze, analysis, a.get_main_activity().replace(".","/"))
+    app_to_analyze = run_request_analysis(app_to_analyze, a, analysis, a.get_main_activity().replace(".","/"))
 
     try:
         app_to_analyze = run_usage_analysis(app_to_analyze, analysis)

@@ -18,6 +18,8 @@ class RequestAnalysis:
 
         self.path = path
 
+        self.explanation = ""
+
         return
 
     def __eq__(self, other):
@@ -27,7 +29,8 @@ class RequestAnalysis:
                 self.method == other.method and
                 self.caller == other.caller and
                 self.reason == other.reason and
-                self.path == other.path)
+                self.path == other.path and
+                self.explanation == other.explanation)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -94,7 +97,12 @@ class RequestAnalysis:
                     # use the count value to keep track of the order
                     path[method_info["count"]] = node
 
-        return cls(permission=perm, method=method, caller=caller, reason=reason, path=path)
+
+        req = cls(permission=perm, method=method, caller=caller, reason=reason, path=path)
+
+        req.explanation = req_analysis_json["explanation"].replace("\\\"", "\"").replace("\\n", "\n")
+
+        return req
 
     def __repr__(self):
         out = "Permission %s requested at:\n" % self.permission
@@ -120,6 +128,11 @@ class RequestAnalysis:
                                                            method.get_access_flags_string())
         else:
             out += "Could not backtrace the permission request to MainActivity.\n"
+
+        if self.explanation:
+            out += "Found explanation for the permission request:\n%s" % self.explanation
+        else:
+            out += "No explanation for the permission request found.\n"
 
         return out
 
@@ -163,7 +176,11 @@ class RequestAnalysis:
 
                     json_out += "\n"
 
-        json_out += "\t" * tab + "\t]\n"
+        json_out += "\t" * tab + "\t],\n"
+
+        # Finally append the explanation
+        json_out += "\t" * tab + "\t\"explanation\" : \"%s\"" % json.dumps(self.explanation)
+
         json_out += "\t" * tab + "}"
 
         return json_out
