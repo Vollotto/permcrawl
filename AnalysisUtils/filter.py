@@ -27,8 +27,8 @@ def filter_target_sdk(apk, analyzed_apk):
     # type: (APK, AnalyzedApk) -> AnalyzedApk
 
     try:
-        analyzed_apk.target_sdk = int(apk.get_effective_target_sdk_version())
-        logging.info("Target SDK version: %d" % int(apk.get_effective_target_sdk_version()))
+        analyzed_apk.target_sdk = int(apk.get_target_sdk_version())
+        logging.info("Target SDK version: %d" % int(apk.get_target_sdk_version()))
 
         # Target SDK version should be greater than 23 (Marshmallow)
         # since Marshmallow introduced dynamic permission requests
