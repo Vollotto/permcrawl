@@ -82,6 +82,7 @@ if __name__ == '__main__':
         logger.setLevel(logging.INFO)
 
     apk = analyze(args.input)
+    apk.apk_path = args.input
 
     if args.print:
         print(repr(apk))

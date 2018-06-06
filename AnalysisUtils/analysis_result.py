@@ -13,6 +13,9 @@ class AnalyzedApk:
         self.app_name = ""
         self.package_name = ""
 
+        # Path to APK on disk
+        self.apk_path = ""
+
         # Defaults make app not analyzable
         self.target_sdk = 0
         self.target_sdk_too_low = True
@@ -34,6 +37,7 @@ class AnalyzedApk:
 
         apk.app_name = json_dict["app_name"]
         apk.package_name = json_dict["package_name"]
+        apk.apk_path = json_dict["apk_path"]
         apk.target_sdk = json_dict["target_sdk"]
 
         apk.target_sdk_too_low = json_dict["target_sdk_too_low"]
@@ -90,6 +94,7 @@ class AnalyzedApk:
 
         json_out += "\t\"app_name\" : \"%s\",\n" % self.app_name
         json_out += "\t\"package_name\" : \"%s\",\n" % self.package_name
+        json_out += "\t\"apk_path\" : \"%s\",\n" % self.apk_path
         json_out += "\t\"target_sdk\" : %d,\n" % self.target_sdk
 
         json_out += "\t\"target_sdk_too_low\" : %s,\n" % json.dumps(self.target_sdk_too_low)
