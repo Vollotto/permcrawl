@@ -1,4 +1,5 @@
 import argparse
+import zipfile
 from AnalysisUtils.AndroguardProject.androguardStarter import invoke_androguard
 from AnalysisUtils.filter import *
 from AnalysisUtils.request_analysis import *
@@ -11,9 +12,13 @@ def analyze(path_to_apk):
 
     logging.info("Starting analysis...")
 
-    a, d, dx = invoke_androguard(path_to_apk)
-
     app_to_analyze = AnalyzedApk()
+
+    try:
+        a, d, dx = invoke_androguard(path_to_apk)
+    except zipfile.BadZipFile:
+        app_to_analyze.error = True
+        return app_to_analyze
 
     app_to_analyze = init_basic_infos(a, app_to_analyze)
 
@@ -89,9 +94,14 @@ if __name__ == '__main__':
 
     if args.json:
         try:
-            with open(os.path.dirname(os.path.realpath(sys.argv[0]))
-                              + "/out/" + apk.package_name.replace(".", "_")
-                              + apk.app_name + ".json", "w") as out:
+            outname = os.path.dirname(os.path.realpath(sys.argv[0])) \
+                      + "/out/" \
+                      + apk.package_name.replace(".", "_").replace("\s","_")\
+                      + "." \
+                      + apk.app_name.replace("\s","_")\
+                      + ".json"
+
+            with open(outname, "w") as out:
                 out.write(apk.to_json())
         except IOError:
             logging.critical("Error when writing to json file!")
