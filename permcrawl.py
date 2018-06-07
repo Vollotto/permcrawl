@@ -6,6 +6,7 @@ from AnalysisUtils.request_analysis import *
 from AnalysisUtils.usage_analysis import *
 from AnalysisUtils.analysis_result import AnalyzedApk
 from androguard.core.analysis.analysis import Analysis
+import hashlib
 
 
 def analyze(path_to_apk):
@@ -17,8 +18,14 @@ def analyze(path_to_apk):
     try:
         a, d, dx = invoke_androguard(path_to_apk)
     except zipfile.BadZipFile:
-        app_to_analyze.error = True
-        return app_to_analyze
+        # File is invalid -> we need a unique dummy name for the app to generate a valid json file
+        hasher = hashlib.md5()
+        with open(path_to_apk, "rb") as apk:
+            buf = apk.read()
+            hasher.update(buf)
+            app_to_analyze.app_name = hasher.hexdigest()
+            app_to_analyze.error = True
+            return app_to_analyze
 
     app_to_analyze = init_basic_infos(a, app_to_analyze)
 
