@@ -25,11 +25,14 @@ def analyze_results(directory):
 def analyze_results_from_json(directory):
     for file in os.listdir(directory):
         if file.endswith(".json"):
-            json_dict = open(os.path.realpath(directory) + '/' + file, "r")
-            # For performance reasons directly evaluate from the json dict
-            # With this we skip invoking androguard again for obtaining an analysis instance
-            # But we also cannot use the classes of our actual framework but need to work directly with json dicts
-            eval_single_analysis_result_from_json(json.loads(json_dict.read()))
+            try:
+                json_dict = open(os.path.realpath(directory) + '/' + file, "r")
+                # For performance reasons directly evaluate from the json dict
+                # With this we skip invoking androguard again for obtaining an analysis instance
+                # But we also cannot use the classes of our actual framework but need to work directly with json dicts
+                eval_single_analysis_result_from_json(json.loads(json_dict.read()))
+            except:
+                print("Could not load %s" % file)
 
 
 def eval_apk(json):
