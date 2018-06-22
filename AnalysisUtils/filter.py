@@ -7,7 +7,7 @@ from androguard.core.api_specific_resources import load_permissions
 def init_basic_infos(apk, analyzed_apk):
     # type: (APK, AnalyzedApk) -> AnalyzedApk
 
-    logging.info("Extracting basic app information...")
+    logging.debug("Extracting basic app information...")
 
     try:
         # Simply Copy Paste the Appname & Packagename

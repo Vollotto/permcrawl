@@ -17,7 +17,7 @@ def backtrace_usage(analysis, usage, visited_xrefs=[]):
         return []
     elif "onRequestPermissionsResult" in usage.get_method().get_name():
         # succesfully backtraced path to permission request
-        logging.info("Found onRequestPermissionsResult")
+        logging.debug("Found onRequestPermissionsResult")
         return [usage.get_method()]
     else:
         # Add the current usage to the xrefs already visited (empty list on first call by default)
@@ -33,7 +33,7 @@ def backtrace_usage(analysis, usage, visited_xrefs=[]):
 
                 # If the result ever is not empty we found a path
                 if backtrace:
-                    logging.info("Adding %s to path..." % str(usage.get_method()))
+                    logging.debug("Adding %s to path..." % str(usage.get_method()))
                     return [usage.get_method()] + backtrace
 
     # If not there exists no path
@@ -48,14 +48,14 @@ def analyze_usage(analysis, permission, perm_map):
     # check needed due to several differrent mappings
     if permission in perm_map.keys():
 
-        logging.info("Permission %s is a possible SDK/framework permission." % permission)
+        logging.debug("Permission %s is a possible SDK/framework permission." % permission)
 
         # query the map for all methods that need this permission
         possible_usages = perm_map[permission]
 
         for possible_usage in possible_usages:
 
-            logging.info("Possible usage: %s" % possible_usage)
+            logging.debug("Possible usage: %s" % possible_usage)
 
             # convert the name to androguard format and try to find the Method in our app
             (classname, methodname) = translate.translate(possible_usage)
@@ -73,12 +73,12 @@ def analyze_usage(analysis, permission, perm_map):
                             should_analyze = True
 
                     if should_analyze:
-                        logging.info("Usage in code: %s" % str(m))
-                        logging.info("Backtracing to onRequestPermissionResult")
+                        logging.debug("Usage in code: %s" % str(m))
+                        logging.debug("Backtracing to onRequestPermissionResult")
                         # Try to backtrace a callgraph to the MainActivity
                         path = backtrace_usage(analysis, m)
                         if not path:
-                            logging.info("Backtracing not successful")
+                            logging.debug("Backtracing not successful")
                         usage = UsageAnalysis(permission, m.get_method(), path, True)
                         # Avoid duplicates
                         if usage not in analyzed_usages:
@@ -107,7 +107,7 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
             if not (method.get_class_name().startswith("Landroid") or
                     method.get_class_name().startswith("Ljava") or
                     method.get_class_name().startswith("Lkotlin")):
-                logging.info("Found possible usage: %s" % str(method_analysis))
+                logging.debug("Found possible usage: %s" % str(method_analysis))
                 to_consider += [(method_analysis, (method, offset))]
 
     # The to_consider list now contains all tuples of type
@@ -117,7 +117,7 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
 
     for (usage, (caller, offset)) in to_consider:
 
-        logging.info("Analyzing %s..." % str(usage))
+        logging.debug("Analyzing %s..." % str(usage))
 
         analyzed_single_usage = []
 
@@ -128,26 +128,26 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
             if permission not in perm_prov_map:
                 continue
 
-            logging.info("Checking permission %s..." % permission)
+            logging.debug("Checking permission %s..." % permission)
 
             # ... and all of their respective provider URIs...
             for uri in perm_prov_map[permission]["uri"]:
 
-                logging.info("Checking URI %s..." % uri)
+                logging.debug("Checking URI %s..." % uri)
 
                 # ... if we can find the URI in the source code of the caller method
                 # TODO: Is there a more effective way?
                 if uri in caller.get_source():
 
-                    logging.info("URI found!")
+                    logging.debug("URI found: %s" % uri)
 
                     # we have to distinguish whether the permission protects rw, r or w access
                     if perm_prov_map[permission]["type"] == "rw":
                         # we don't need do analyze distinguish rw permissions further and
                         # are able to backtrace our method as usual
-                        logging.info("Type is RW, Backtracing to onRequestPermissionResult...")
+                        logging.debug("Type is RW, Backtracing to onRequestPermissionResult...")
                         if not path:
-                            logging.info("Backtracing not successful")
+                            logging.debug("Backtracing not successful")
 
                         analyzed_usage = UsageAnalysis(permission, usage.get_method(), path, True)
 
@@ -155,13 +155,13 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
                             analyzed_single_usage.append(analyzed_usage)
 
                     elif perm_prov_map[permission]["type"] == "r":
-                        logging.info("Type is R")
+                        logging.debug("Type is R")
                         # for read permissions we only need to consider the "query" method
                         if usage.get_method().get_name() == "query":
-                            logging.info("Method is query, Backtracing to onRequestPermissionResult")
+                            logging.debug("Method is query, Backtracing to onRequestPermissionResult")
                             path = backtrace_usage(analysis, usage)
                             if not path:
-                                logging.info("Backtracing not successful")
+                                logging.debug("Backtracing not successful")
 
                             analyzed_usage = UsageAnalysis(permission, usage.get_method(), path, True)
 
@@ -170,10 +170,10 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
 
                     elif perm_prov_map[permission]["type"] == "w":
                         # TODO: not finegrained yet
-                        logging.info("Type is w")
+                        logging.debug("Type is w")
                         path = backtrace_usage(analysis, usage)
                         if not path:
-                            logging.info("Backtracing not successful")
+                            logging.debug("Backtracing not successful")
 
                         analyzed_usage = UsageAnalysis(permission, usage.get_method(), path, True)
 
@@ -236,9 +236,9 @@ def run_usage_analysis(apk, analysis):
 
     for permission in apk.requested_permissions_from_manifest:
 
-        logging.info("Analyzing usages of SDK permissions...")
+        logging.debug("Analyzing usages of SDK permissions...")
         usages += analyze_usage(analysis, permission, perm_sdk_map)
-        logging.info("Analyzing usages of framework permissions...")
+        logging.debug("Analyzing usages of framework permissions...")
         usages += analyze_usage(analysis, permission, perm_framework_map)
 
     logging.info("Analyzing usages of provider permissions")
