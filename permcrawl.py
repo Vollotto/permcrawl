@@ -110,6 +110,7 @@ if __name__ == '__main__':
 
             with open(outname, "w") as out:
                 out.write(apk.to_json())
+                out.close()
         except IOError:
             logging.critical("Error when writing to json file!")
             exit(44)
