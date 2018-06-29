@@ -5,7 +5,7 @@ import sys
 import logging
 import traceback
 from datetime import datetime
-from .evalFormatter import format_single_analysis
+from evalFormatter import format_single_analysis
 
 # HTML-Template for generating basic app report
 APP_TEMPLATE = \
@@ -80,7 +80,7 @@ def generate_report(app_dict, report_dir=""):
     # Returns a DataFrame containing a report overview of the analysis results
     # Optionally: Creates a HTML report of the results
 
-    logging.info("Generating overview report for %s.%s", (app_dict["package_name"], app_dict["app_name"]))
+    logging.info("Generating overview report for %s.%s" % (app_dict["package_name"], app_dict["app_name"]))
 
     # Creates and returns an overview dict for the app
     if report_dir:
