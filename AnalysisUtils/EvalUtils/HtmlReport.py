@@ -43,12 +43,12 @@ def single_html_report_from_dict(app_dict):
     if not_analyzable:
         reason = " due to the following reason: "
 
-        if app_dict["target_sdk_too_low"]:
+        if app_dict["error"]:
+            reason += "An error occurred during analysis."
+        elif app_dict["target_sdk_too_low"]:
             reason += "Target SDK is too low."
         elif app_dict["no_permission"]:
             reason += "No permissions requested."
-        elif app_dict["error"]:
-            reason += "An error occurred during analysis."
     else:
         reason = "."
 
@@ -56,11 +56,14 @@ def single_html_report_from_dict(app_dict):
                              " not " if not_analyzable else " ", reason, app_dict["target_sdk"],
                              ", ".join(app_dict["declared_permissions"]))
 
+    if not_analyzable:
+        return report
+
     # Now we can continue with the detailed permission reports:
 
     for perm in app_dict["declared_permissions"]:
 
-        location_desc = "educated " if app_dict[perm]["educated"] else "asked"
+        location_desc = "educated " if app_dict[perm]["educated"] else "asked "
         location_desc += "up-front" if app_dict[perm]["up_front"] else (
             "in-context" if app_dict[perm]["in_context"] else "neither up-front nor in-context"
         )

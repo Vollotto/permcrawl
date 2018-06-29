@@ -24,6 +24,7 @@ def analyze(path_to_apk):
             buf = apk.read()
             hasher.update(buf)
             app_to_analyze.app_name = hasher.hexdigest()
+            app_to_analyze.package_name = hasher.hexdigest()
             app_to_analyze.error = True
             return app_to_analyze
 
