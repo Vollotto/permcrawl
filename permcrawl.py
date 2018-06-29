@@ -23,7 +23,7 @@ def analyze(path_to_apk):
         with open(path_to_apk, "rb") as apk:
             buf = apk.read()
             hasher.update(buf)
-            app_to_analyze.app_name = hasher.hexdigest()
+            app_to_analyze.app_name = "error"
             app_to_analyze.package_name = hasher.hexdigest()
             app_to_analyze.error = True
             return app_to_analyze
