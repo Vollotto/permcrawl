@@ -2,6 +2,8 @@ import pandas as pd
 import os
 import json
 import sys
+import logging
+import traceback
 from datetime import datetime
 from .evalFormatter import format_single_analysis
 
@@ -31,6 +33,8 @@ PERM_TEMPLATE = \
 
 
 def single_html_report_from_dict(app_dict):
+
+    logging.info("Generating HTML report for %s.%s" % (app_dict["package_name"], app_dict["app_name"]))
 
     # First prepare the app Template:
 
@@ -72,6 +76,8 @@ def single_html_report_from_dict(app_dict):
 def generate_report(app_dict, report_dir=""):
     # Returns a DataFrame containing a report overview of the analysis results
     # Optionally: Creates a HTML report of the results
+
+    logging.info("Generating overview report for %s.%s", (app_dict["package_name"], app_dict["app_name"]))
 
     # Creates and returns an overview dict for the app
     if report_dir:
@@ -165,14 +171,21 @@ def generate_reports_from_json(indir, outdir=""):
 
     if outdir:
         with open(os.path.realpath(outdir) + "/index.html", "w") as index:
-            html = "<h1>Report from %s</h1>\n" \
-                   "<p>Out of overall %d apps, %d were successfully analyzed.</p>\n" \
-                   "<h2>Report Overview:</h2>\n" \
-                   "%s" % (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), analyzed_apps, analyzable_apps,
-                           df.to_html(escape=False))
-            index.write(html)
+            try:
+                report_html = df.to_html(escape=False)
+                html = "<h1>Report from %s</h1>\n" \
+                    "<p>Out of overall %d apps, %d were successfully analyzed.</p>\n" \
+                    "<h2>Report Overview:</h2>\n" \
+                    "%s" % (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), analyzed_apps, analyzable_apps,
+                           report_html)
+                index.write(html)
+                return df
 
-    return df
+            except:
+                (ex_type, ex_value, tb) = sys.exc_info()
+                traceback.print_exception(ex_type, ex_value, tb)
+                logging.error("Analyzed apps: %d" % analyzed_apps)
+                logging.error("Error when writing the overall HTML Report")
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
