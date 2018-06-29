@@ -188,6 +188,9 @@ def generate_reports_from_json(indir, outdir=""):
                 logging.error("Error when writing the overall HTML Report")
 
 if __name__ == '__main__':
+
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
     if len(sys.argv) > 1:
         if len(sys.argv) > 2:
             print(generate_reports_from_json(sys.argv[1], sys.argv[2]))
