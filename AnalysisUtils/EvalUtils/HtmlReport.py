@@ -154,6 +154,20 @@ def generate_reports_from_json(indir, outdir=""):
                 del app_dict
 
                 basic_reports.update(report)
+
+                try:
+                    d = pd.DataFrame(basic_reports, index=["Analyzable", "Target SDK", "Declared Permissions",
+                                            "Permissions asked up-front", "Permissions educated up-front",
+                                            "Permissions asked in-context", "Permissions educated in-context",
+                                            "Non-backtracable asked permissions",
+                                            "Non-backtracable educated permissions"]).T
+                    x = d.to_html(escape=False)
+                    del d
+                    del x
+
+                except:
+                    logging.CRITICAL("Error when creating DataFrame caused by report: %s" % report)
+
                 # Can only be a set with one element
                 report_key = list(report.keys())[0]
 
