@@ -6,7 +6,7 @@ Prerequisites:
   
 androguard needs to be installed  
 
-Necessary directory structure (already created) when cloning:
+Necessary directory structure (already created when cloning):
 for logs a "log" directory must exist in the base directory  
 for json files an "out" directory must exist in the base directory  
 for html reports the directory structure <some_out_directory>/reports/ must exist  
