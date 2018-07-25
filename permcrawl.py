@@ -7,6 +7,7 @@ from AnalysisUtils.usage_analysis import *
 from AnalysisUtils.analysis_result import AnalyzedApk
 from androguard.core.analysis.analysis import Analysis
 import hashlib
+import datetime
 
 
 def analyze(path_to_apk):
@@ -56,8 +57,7 @@ def analyze(path_to_apk):
     try:
         app_to_analyze = run_usage_analysis(app_to_analyze, analysis)
     except Exception as e:
-        logging.critical("Exception during UsageAnalysis:\n%s" % str(e))
-        exit(43)
+        app_to_analyze.error = True
 
     logging.info("Finished analysis...")
 
@@ -83,11 +83,19 @@ if __name__ == '__main__':
     parser.add_argument("-j", "--json",
                         action='store_true', help='Export the collected data into json format')
 
+    parser.add_argument("-l", "--log",
+                        action='store_true', help='Activate logging to a file')
+
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.WARNING, format='%(asctime)s - %(levelname)s - %(message)s')
 
     logger = logging.getLogger()
+
+    if args.log:
+        fh = logging.FileHandler("%s/log/permcrawl%s.log" % (os.path.dirname(os.path.realpath(sys.argv[0])),
+                                                             datetime.datetime.now()))
+        logger.addHandler(fh)
 
     if args.debug:
         logger.setLevel(logging.DEBUG)

@@ -43,10 +43,10 @@ def format_requests(analysis_data, app_dict):
                                                             request["method"]["name"],
                                                             request["method"]["descriptor"],
                                                             request["method"]["access_flags"]),
-                "caller": "%s->%s%s [access_flags=%s]" % (request["method"]["class_name"],
-                                                          request["method"]["name"],
-                                                          request["method"]["descriptor"],
-                                                          request["method"]["access_flags"]),
+                "caller": "%s->%s%s [access_flags=%s]" % (request["caller"]["class_name"],
+                                                          request["caller"]["name"],
+                                                          request["caller"]["descriptor"],
+                                                          request["caller"]["access_flags"]),
                 # if the backtrace path is not empty we convert it into string representations separated by ';'
                 "backtrace": ("; ".join(["{0}->{1}{2} [access_flags={3}]".
                                        format(node["class_name"], node["name"],
@@ -91,10 +91,6 @@ def format_usages(analysis_data, app_dict):
                                                             usage["method"]["name"],
                                                             usage["method"]["descriptor"],
                                                             usage["method"]["access_flags"]),
-                "caller": "%s->%s%s [access_flags=%s]" % (usage["method"]["class_name"],
-                                                          usage["method"]["name"],
-                                                          usage["method"]["descriptor"],
-                                                          usage["method"]["access_flags"]),
                 "backtrace": (";".join(["{0}->{1}{2} [access_flags={3}]".
                                        format(node["class_name"], node["name"],
                                               node["descriptor"], node["access_flags"])

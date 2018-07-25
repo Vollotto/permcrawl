@@ -1,9 +1,12 @@
 out/*
-out
-AnalysisUtils/ansatz
+htmlOut/index.html
+htmlOut/reports/*
 .git
 .idea
 AnalysisUtils/__pycache__/*
 AnalysisUtils/__pycache__
 *.pyc
 test.txt
+*.log
+out_test
+log/*

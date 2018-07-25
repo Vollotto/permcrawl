@@ -56,7 +56,7 @@ class RequestAnalysis:
         for ma in ma_gen:
             method = ma.get_method()
 
-        caller = None
+        caller = ""
         reason = ""
 
         if not "Unknown Permission" == perm:

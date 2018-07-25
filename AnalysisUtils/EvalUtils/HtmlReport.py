@@ -85,15 +85,14 @@ def generate_report(app_dict, report_dir=""):
     # Creates and returns an overview dict for the app
     if report_dir:
         # Writes the specific app html report to the specified directory (if given)
-        report_out = open("%s/%s.%s.html" % (os.path.realpath(report_dir), app_dict["package_name"],
-                                            app_dict["app_name"]), "w")
+        report_out = open("%s/%s.html" % (os.path.realpath(report_dir), app_dict["package_name"]), "w")
         report_out.write(single_html_report_from_dict(app_dict))
         # Use html link for the name
-        template_key = "<a href=\"%s\" target=\"_blank\">%s.%s</a>" % (report_out.name, app_dict["package_name"],
-                                                                       app_dict["app_name"])
+        template_key = "<a href=\"reports/%s.html\" target=\"_blank\">%s.%s</a>" % (app_dict["package_name"],
+                                                                       app_dict["package_name"], app_dict["app_name"])
         report_out.close()
     else:
-        template_key = "%s.%s" % (app_dict["package_name"], app_dict["app_name"])
+        template_key = app_dict["package_name"]
 
     # after writing the special report return a basic dict for the overall report
     template = {
@@ -180,11 +179,12 @@ def generate_reports_from_json(indir, outdir=""):
                 print("Could not load %s" % file)
 
     # Change orientation s.t. app names form lines (and also fix the index order)
-    df = pd.DataFrame(basic_reports, index=["Analyzable", "Target SDK", "Declared Permissions",
-                                            "Permissions asked up-front", "Permissions educated up-front",
-                                            "Permissions asked in-context", "Permissions educated in-context",
-                                            "Non-backtracable asked permissions",
-                                            "Non-backtracable educated permissions"]).T
+    df = pd.DataFrame(basic_reports#,index=["Analyzable", "Target SDK", "Declared Permissions",
+                                            #"Permissions asked up-front", "Permissions educated up-front",
+                                            #"Permissions asked in-context", "Permissions educated in-context",
+                                            #"Non-backtracable asked permissions",
+                                            #"Non-backtracable educated permissions"]
+    ).T
 
     if outdir:
         with open(os.path.realpath(outdir) + "/index.html", "w") as index:
@@ -203,13 +203,16 @@ def generate_reports_from_json(indir, outdir=""):
                 traceback.print_exception(ex_type, ex_value, tb)
                 logging.error("Analyzed apps: %d" % analyzed_apps)
                 logging.error("Error when writing the overall HTML Report")
+    else:
+        return df
 
 if __name__ == '__main__':
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    if len(sys.argv) > 1:
-        if len(sys.argv) > 2:
-            print(generate_reports_from_json(sys.argv[1], sys.argv[2]))
-        else:
-            print(generate_reports_from_json((sys.argv[1])))
+    if len(sys.argv) > 2:
+        print(generate_reports_from_json(sys.argv[1], sys.argv[2]))
+        exit(0)
+    else:
+        print("Please specify an input directory with json files and an output directory for the HTML report!")
+        exit(1)
