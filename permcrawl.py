@@ -8,6 +8,8 @@ from AnalysisUtils.analysis_result import AnalyzedApk
 from androguard.core.analysis.analysis import Analysis
 import hashlib
 import datetime
+import traceback
+import sys
 
 
 def analyze(path_to_apk):
@@ -52,11 +54,16 @@ def analyze(path_to_apk):
     logging.info("Creating XREFs...")
     analysis.create_xref()
 
-    app_to_analyze = run_request_analysis(app_to_analyze, a, analysis, a.get_main_activity().replace(".","/"))
+    main_activities = list(map(lambda act:act.replace(".","/"),a.get_main_activities()))
+
+    app_to_analyze = run_request_analysis(app_to_analyze, a, analysis, main_activities)
 
     try:
         app_to_analyze = run_usage_analysis(app_to_analyze, analysis)
-    except Exception as e:
+    except:
+        traceback.print_exc(file=sys.stdout)
+        logging.info("An error occurred during usage analysis. " +
+                     "Still continuing, hoping that the request analysis is valuable...")
         app_to_analyze.error = True
 
     logging.info("Finished analysis...")

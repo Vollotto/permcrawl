@@ -90,7 +90,6 @@ def analyze_usage(analysis, permission, perm_map):
 def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
     # type: (Analysis, List[str], dict) -> List[UsageAnalysis]
 
-
     analyzed_usages = []
 
     # usually ContentProviders are queried via ContentResolver
@@ -115,51 +114,43 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
     # where the MethodAnalysis is the ContentResolver.query() method and the second one
     # the method where this call occurs together with the exact offset in the method
 
+
     for (usage, (caller, offset)) in to_consider:
 
         logging.debug("Analyzing %s..." % str(usage))
 
         analyzed_single_usage = []
 
+        error = False
+
         # now check for each of the requested permissions (if it is a "Provider Permission")...
 
         for permission in requested_permissions:
 
-            if permission not in perm_prov_map:
+            if permission not in perm_prov_map.keys():
+                print("%s not in provider map" % permission)
                 continue
 
             logging.debug("Checking permission %s..." % permission)
+
 
             # ... and all of their respective provider URIs...
             for uri in perm_prov_map[permission]["uri"]:
 
                 logging.debug("Checking URI %s..." % uri)
-
                 # ... if we can find the URI in the source code of the caller method
                 # TODO: Is there a more effective way?
-                if uri in caller.get_source():
 
-                    logging.debug("URI found: %s" % uri)
+                try:
+                    if uri in caller.get_source():
 
-                    # we have to distinguish whether the permission protects rw, r or w access
-                    if perm_prov_map[permission]["type"] == "rw":
-                        # we don't need do analyze distinguish rw permissions further and
-                        # are able to backtrace our method as usual
-                        logging.debug("Type is RW, Backtracing to onRequestPermissionResult...")
-                        if not path:
-                            logging.debug("Backtracing not successful")
+                        logging.debug("URI found: %s" % uri)
 
-                        analyzed_usage = UsageAnalysis(permission, usage.get_method(), path, True)
-
-                        if analyzed_usage not in analyzed_single_usage:
-                            analyzed_single_usage.append(analyzed_usage)
-
-                    elif perm_prov_map[permission]["type"] == "r":
-                        logging.debug("Type is R")
-                        # for read permissions we only need to consider the "query" method
-                        if usage.get_method().get_name() == "query":
-                            logging.debug("Method is query, Backtracing to onRequestPermissionResult")
-                            path = backtrace_usage(analysis, usage)
+                        # we have to distinguish whether the permission protects rw, r or w access
+                        if perm_prov_map[permission]["type"] == "rw":
+                            # we don't need do analyze distinguish rw permissions further and
+                            # are able to backtrace our method as usual
+                            logging.debug("Type is RW, Backtracing to onRequestPermissionResult...")
                             if not path:
                                 logging.debug("Backtracing not successful")
 
@@ -168,21 +159,49 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
                             if analyzed_usage not in analyzed_single_usage:
                                 analyzed_single_usage.append(analyzed_usage)
 
-                    elif perm_prov_map[permission]["type"] == "w":
-                        # TODO: not finegrained yet
-                        logging.debug("Type is w")
-                        path = backtrace_usage(analysis, usage)
-                        if not path:
-                            logging.debug("Backtracing not successful")
+                        elif perm_prov_map[permission]["type"] == "r":
+                            logging.debug("Type is R")
+                            # for read permissions we only need to consider the "query" method
+                            if "query" in usage.get_method().get_name():
+                                logging.debug("Method is query, Backtracing to onRequestPermissionResult")
+                                path = backtrace_usage(analysis, usage)
+                                if not path:
+                                    logging.debug("Backtracing not successful")
 
-                        analyzed_usage = UsageAnalysis(permission, usage.get_method(), path, True)
+                                analyzed_usage = UsageAnalysis(permission, usage.get_method(), path, True)
 
-                        if analyzed_usage not in analyzed_single_usage:
-                            analyzed_single_usage.append(analyzed_usage)
+                                if analyzed_usage not in analyzed_single_usage:
+                                    analyzed_single_usage.append(analyzed_usage)
 
-                    else:
-                        mes = "Unknown permission type: %s" % (perm_prov_map[permission]["type"])
-                        raise Exception(mes)
+                        elif perm_prov_map[permission]["type"] == "w":
+                            logging.debug("Type is w")
+                            # for write permissions we conside "insert", "update" and "delete"
+                            if (("insert "in usage.get_method().get_name()) or
+                                ("update" in usage.get_method().get_name()) or
+                                ("delete" in usage.get_method().get_name())):
+                                path = backtrace_usage(analysis, usage)
+                                if not path:
+                                    logging.debug("Backtracing not successful")
+
+                                analyzed_usage = UsageAnalysis(permission, usage.get_method(), path, True)
+
+                                if analyzed_usage not in analyzed_single_usage:
+                                    analyzed_single_usage.append(analyzed_usage)
+
+                        else:
+                            mes = "Unknown permission type: %s" % (perm_prov_map[permission]["type"])
+                            raise Exception(mes)
+                except TypeError:
+                    # Is sometimes thrown by Androguard
+                    # Error by Androguard -> skip this caller
+                    error = True
+                    break
+
+            if error:
+                break
+
+        if error:
+            continue
 
         # if the single usage analysis list is empty this must be a usage that was for some reason not analyzable
         # so we create a "fake" UsageAnalysis to inform the user and let him check
@@ -200,6 +219,8 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
         else:
             analyzed_usages += analyzed_single_usage
 
+    print(8)
+
     return analyzed_usages
 
 
@@ -210,27 +231,32 @@ def run_usage_analysis(apk, analysis):
     base_path = os.path.dirname(os.path.realpath(sys.argv[0]))
 
     # Load the permission-sdk-map and the permission-framework map from the resp. json files as dicts
+    # Take car of the used workaround for circumventing Androguard's lack of target SDK 26 and above
+    if apk.target_sdk > 25:
+        shadow_target_sdk = 25
+    else:
+        shadow_target_sdk = apk.target_sdk
 
     with open(base_path + "/AnalysisUtils/"
-              "API_Res/perm-sdk-map-api" + str(apk.target_sdk) + ".json") as sdk_dict:
+              "API_Res/perm-sdk-map-api" + str(shadow_target_sdk) + ".json",  "r") as sdk_dict:
         perm_sdk_map = json.load(sdk_dict)
 
     if not perm_sdk_map:
-        raise Exception("Could not load the permission-sdk mapping for API " + str(apk.target_sdk))
+        raise Exception("Could not load the permission-sdk mapping for API " + str(shadow_target_sdk))
 
-    with open(base_path + "/AnalysisUtils/API_Res/perm-framework-map-api" + str(
-            apk.target_sdk) + ".json") as framework_dict:
+    with open(base_path + "/AnalysisUtils/API_Res/perm-framework-map-api" + str(shadow_target_sdk) + ".json", "r") \
+            as framework_dict:
         perm_framework_map = json.load(framework_dict)
 
     if not perm_framework_map:
-        raise Exception("Could not load the permission-framework mapping for API " + str(apk.target_sdk))
+        raise Exception("Could not load the permission-framework mapping for API " + str(shadow_target_sdk))
 
-    with open(base_path + "/AnalysisUtils/API_Res/ContentProvider/perm-provider-map23.json") \
+    with open(base_path + "/AnalysisUtils/API_Res/ContentProvider/perm-provider-map23.json",  "r") \
             as provider_dict:
         perm_provider_map = json.load(provider_dict)
 
     if not perm_provider_map:
-        raise Exception("Could not load the permission-provider mapping for API " + str(apk.target_sdk))
+        raise Exception("Could not load the permission-provider mapping for API " + str(shadow_target_sdk))
 
     usages = []
 

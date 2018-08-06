@@ -33,8 +33,6 @@ def filter_target_sdk(apk, analyzed_apk):
         # Target SDK version should be greater than or equal 23 (Marshmallow)
         # since Marshmallow introduced dynamic permission requests
         if analyzed_apk.target_sdk >= 23:
-            if analyzed_apk.target_sdk > 25:
-                analyzed_apk.target_sdk = 25
             analyzed_apk.target_sdk_too_low = False
         else:
             logging.warning("Illegal target SDK version")
@@ -50,7 +48,11 @@ def filter_manifest_permission_requests(apk, analyzed_apk):
 
     # initialize dictionary for permissions
     logging.info("Loading dictionary for permissions...")
-    perms = load_permissions(analyzed_apk.target_sdk)
+
+    if analyzed_apk.target_sdk > 25:
+        perms = load_permissions(25)
+    else:
+        perms = load_permissions(analyzed_apk.target_sdk)
 
     # list for permissions requested in manifest
     requested_permissions = []

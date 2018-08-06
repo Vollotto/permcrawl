@@ -7,6 +7,15 @@ import traceback
 from datetime import datetime
 from evalFormatter import format_single_analysis
 
+sdkCount = {
+    23 : 0,
+    24 : 0,
+    25 : 0,
+    26 : 0,
+    27 : 0,
+    28 : 0,
+}
+
 # HTML-Template for generating basic app report
 APP_TEMPLATE = \
     "<h2>%s.%s</h2>\n" \
@@ -108,6 +117,10 @@ def generate_report(app_dict, report_dir=""):
              "Non-backtracable educated permissions": []
         }
     }
+
+    if template[template_key]["Analyzable"]:
+        global sdkCount
+        sdkCount[template[template_key]["Target SDK"]] += 1
 
     for perm in app_dict["declared_permissions"]:
         if app_dict[perm]["up_front"]:
@@ -212,6 +225,11 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 2:
         print(generate_reports_from_json(sys.argv[1], sys.argv[2]))
+
+        global sdkCount
+        for version in sdkCount.keys():
+            print("%d apps declare target SDK %d." % (sdkCount[version], version))
+
         exit(0)
     else:
         print("Please specify an input directory with json files and an output directory for the HTML report!")

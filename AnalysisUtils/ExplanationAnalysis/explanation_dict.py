@@ -3,24 +3,26 @@ basic_terms = [
     "permission",
     "require",
     "allow",
-    "need"
+    "need",
+    "grant"
 ]
 
 perm_specific_terms = {
     "android.permission.READ_CONTACTS": ["read", "contact", "import", "synchronize", "synchronization", "friend"],
     "android.permission.WRITE_CONTACTS": ["write", "contact", "import", "export", "create", "manage", "synchronize",
                                           "synchronization", "friend"],
-    "android.permission.READ_CALENDAR" : ["read", "calendar", "event", "date", "meeting", "schedule", "agenda", "task"],
-    "android.permission.WRITE_CALENDAR" : ["write", "calendar", "event", "date", "meeting", "import", "export",
-                                           "manage", "schedule", "agenda", "task"],
+    "android.permission.READ_CALENDAR" : ["read", "calendar", "event", "date", "meeting", "schedule", "agenda", "task",
+                                          "import"],
+    "android.permission.WRITE_CALENDAR" : ["write", "create", "calendar", "event", "date", "meeting", "export","manage",
+                                           "schedule", "agenda", "task"],
     "android.permission.SEND_SMS" : ["send", "sms", "message"],
     "android.permission.RECEIVE_SMS" : ["receive", "sms", "message"],
     "android.permission.READ_SMS" : ["read", "sms", "message"],
     "android.permission.RECEIVE_WAP_PUSH" : ["receive", "wap", "push", "message"],
     "android.permission.RECEIVE_MMS" : ["receive", "mms", "message"],
     "android.permission.READ_CELL_BROADCASTS" : ["cell broadcast", "cell information"],
-    "android.permission.READ_EXTERNAL_STORAGE" : ["read", "external storage", "file", "media", "backup", "sdcard"],
-    "android.permission.WRITE_EXTERNAL_STORAGE" : ["write", "create", "modify", "external storage", "file", "media",
+    "android.permission.READ_EXTERNAL_STORAGE" : ["read", "storage", "file", "media", "backup", "sdcard"],
+    "android.permission.WRITE_EXTERNAL_STORAGE" : ["write", "create", "modify", "storage", "file", "media",
                                                    "backup", "sdcard"],
     "android.permission.ACCESS_FINE_LOCATION" : ["precise", "location", "gps", "track"],
     "android.permission.ACCESS_COARSE_LOCATION" : ["coarse", "approximate", "location", "gps", "track"],
@@ -40,5 +42,4 @@ perm_specific_terms = {
     "com.android.launcher.permission.INSTALL_SHORTCUT" : ["install", "create", "shortcut", "launcher"],
     "com.android.launcher.permission.UNINSTALL_SHORTCUT" : ["uninstall","remove", "shortcut", "launcher"],
     "com.android.email.permission.READ_ATTACHMENT" : ["attachment", "email"],
-    "android.permission.READ_TV_LISTINGS" : []
 }
