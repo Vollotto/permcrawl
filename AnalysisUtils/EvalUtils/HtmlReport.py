@@ -157,11 +157,12 @@ def generate_reports_from_json(indir, outdir=""):
         if file.endswith(".json"):
             try:
                 json_file = open(os.path.realpath(indir) + '/' + file, "r")
-
+                # Format a single report for each JSON file
                 app_dict = format_single_analysis(json.loads(json_file.read()))
 
                 analyzed_apps += 1
 
+                # If outdir specified create report in it
                 report = generate_report(app_dict, ((outdir + "reports/") if outdir else ""))
                 del app_dict
 
@@ -173,6 +174,7 @@ def generate_reports_from_json(indir, outdir=""):
                                             "Permissions asked in-context", "Permissions educated in-context",
                                             "Non-backtracable asked permissions",
                                             "Non-backtracable educated permissions"]).T
+                    # For testing purposes (does not influence runtime heavily)
                     x = d.to_html(escape=False)
                     del d
                     del x
@@ -191,15 +193,11 @@ def generate_reports_from_json(indir, outdir=""):
             except:
                 print("Could not load %s" % file)
 
-    # Change orientation s.t. app names form lines (and also fix the index order)
-    df = pd.DataFrame(basic_reports#,index=["Analyzable", "Target SDK", "Declared Permissions",
-                                            #"Permissions asked up-front", "Permissions educated up-front",
-                                            #"Permissions asked in-context", "Permissions educated in-context",
-                                            #"Non-backtracable asked permissions",
-                                            #"Non-backtracable educated permissions"]
-    ).T
+    # Change orientation s.t. app names form lines
+    df = pd.DataFrame(basic_reports).T
 
     if outdir:
+        # Write overall report to output directory
         with open(os.path.realpath(outdir) + "/index.html", "w") as index:
             try:
                 report_html = df.to_html(escape=False)
@@ -220,6 +218,8 @@ def generate_reports_from_json(indir, outdir=""):
         return df
 
 if __name__ == '__main__':
+    # Arguments: input directory where JSON files are contained
+    #           output directory for HTML report
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 

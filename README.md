@@ -3,7 +3,8 @@
 Permcrawl is able to analyze APK files for permission requests and their corresponding usages  
   
 Prerequisites:  
-  
+
+Python >3.5 needs to be installed
 androguard needs to be installed  
 
 Necessary directory structure (already created when cloning):
@@ -25,3 +26,5 @@ indir is a mandatory argument that specifies a directory with permcrawl json out
 outdir is a mandatory argument that specifies a directory where the HTML reports should be created, which must have the structure explained above  
   
 For larger datasets, GNU parallel is recommended  
+
+The usual usage of permcrawl is first collecting data and persisting it into JSON files wit permcrawl itself and then creating reports with the HTMLReport.py script

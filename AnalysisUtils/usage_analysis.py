@@ -11,6 +11,13 @@ import os
 
 
 def backtrace_usage(analysis, usage, visited_xrefs=[]):
+    """
+    Tries to backtrace a permission usage to "onRequestPermissionsResult"
+    :param analysis: Androguards Analysis instance
+    :param usage: The MethodClassAnalysis instance of the usage
+    :param visited_xrefs: All XREFs from that have already been visited during backtracing
+    :return: The path of MethodClassAnalysis instances from the usage to "onRequestPermissionsResult"
+    """
     # type: (Analysis, MethodClassAnalysis, List[MethodClassAnalysis]) -> List[EncodedMethod]
     if usage in visited_xrefs:
         # make sure that we don't end in a cyclic path
@@ -23,12 +30,13 @@ def backtrace_usage(analysis, usage, visited_xrefs=[]):
         # Add the current usage to the xrefs already visited (empty list on first call by default)
         visited_xrefs += [usage]
 
-        # If we do not have xrefs from this path won't lead to any result
+        # If we do not have XREFs from, this path won't lead to any result
         if not usage.get_xref_from():
             return []
         else:
             # Backtrace all XREFs from
             for (ref_class, ref_method, offset) in usage.get_xref_from():
+                # Recursively call the backtrace method with the XREF as new usage
                 backtrace = backtrace_usage(analysis, analysis.get_method_analysis(ref_method), visited_xrefs)
 
                 # If the result ever is not empty we found a path
@@ -41,6 +49,13 @@ def backtrace_usage(analysis, usage, visited_xrefs=[]):
 
 
 def analyze_usage(analysis, permission, perm_map):
+    """
+    Checks SDK/framework usages of permissions and creates and returns a list of UsageAnalysis instances
+    :param analysis: Androguards Analysis instance
+    :param usage: The MethodClassAnalysis instance of the usage
+    :param perm_map: axplorer mapping for framework or SDK usages according to the target SDK of the app
+    :return: a list of UsageAnalysis instances
+    """
     # type: (Analysis, str, dict) -> List[UsageAnalysis]
 
     analyzed_usages = []
@@ -61,6 +76,7 @@ def analyze_usage(analysis, permission, perm_map):
             (classname, methodname) = translate.translate(possible_usage)
             methods = analysis.find_methods(classname, methodname)
 
+            # for all identified methods check if it is contained in the app to analyze
             if methods:
                 for m in methods:
                     should_analyze = False
@@ -88,6 +104,15 @@ def analyze_usage(analysis, permission, perm_map):
 
 
 def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
+    """
+    Checks ContentProvider usages of permissions and creates and returns a list of UsageAnalysis instances
+
+    :param analysis: Androguards Analysis instance
+    :param requested_permissions: The list of permissions requested by the app in its manifest
+    :param perm_prov_map: The Permission->ContentProvider map (.API_Res.ContentProvider) according to the target SDK of
+    the app to analyze
+    :return: a list of UsageAnalysis instances
+    """
     # type: (Analysis, List[str], dict) -> List[UsageAnalysis]
 
     analyzed_usages = []
@@ -114,7 +139,6 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
     # where the MethodAnalysis is the ContentResolver.query() method and the second one
     # the method where this call occurs together with the exact offset in the method
 
-
     for (usage, (caller, offset)) in to_consider:
 
         logging.debug("Analyzing %s..." % str(usage))
@@ -139,7 +163,6 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
 
                 logging.debug("Checking URI %s..." % uri)
                 # ... if we can find the URI in the source code of the caller method
-                # TODO: Is there a more effective way?
 
                 try:
                     if uri in caller.get_source():
@@ -151,12 +174,14 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
                             # we don't need do analyze distinguish rw permissions further and
                             # are able to backtrace our method as usual
                             logging.debug("Type is RW, Backtracing to onRequestPermissionResult...")
+                            path = backtrace_usage(analysis, usage)
                             if not path:
                                 logging.debug("Backtracing not successful")
 
                             analyzed_usage = UsageAnalysis(permission, usage.get_method(), path, True)
 
                             if analyzed_usage not in analyzed_single_usage:
+                                # We do not want duplicates in the returning list
                                 analyzed_single_usage.append(analyzed_usage)
 
                         elif perm_prov_map[permission]["type"] == "r":
@@ -166,6 +191,7 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
                                 logging.debug("Method is query, Backtracing to onRequestPermissionResult")
                                 path = backtrace_usage(analysis, usage)
                                 if not path:
+                                    # We do not want duplicates in the returning list
                                     logging.debug("Backtracing not successful")
 
                                 analyzed_usage = UsageAnalysis(permission, usage.get_method(), path, True)
@@ -186,6 +212,7 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
                                 analyzed_usage = UsageAnalysis(permission, usage.get_method(), path, True)
 
                                 if analyzed_usage not in analyzed_single_usage:
+                                    # We do not want duplicates in the returning list
                                     analyzed_single_usage.append(analyzed_usage)
 
                         else:
@@ -204,7 +231,7 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
             continue
 
         # if the single usage analysis list is empty this must be a usage that was for some reason not analyzable
-        # so we create a "fake" UsageAnalysis to inform the user and let him check
+        # so we create a "fake" UsageAnalysis to inform the user and let him check for testing purposes
         if len(analyzed_single_usage) == 0:
 
             reason = "Could not find a matching permission for the call to ContentResolver in:\n"
@@ -219,24 +246,33 @@ def analyze_provider_usages(analysis, requested_permissions, perm_prov_map):
         else:
             analyzed_usages += analyzed_single_usage
 
-    print(8)
-
     return analyzed_usages
 
 
-def run_usage_analysis(apk, analysis):
+def run_usage_analysis(analyzed_apk, analysis):
+    """
+    Executes sequentially all steps needed for complete UsageAnalysis:
+        1. permission-protected SDK methods
+        2. permission-protected framework methods
+        3. permission-protected ContentProvider invocations
+    :param analyzed_apk: The result of the whole analysis as instance of :class:`~analysis_result.AnalyzedApk`
+    :param analysis: Instance of Androguards analysis class
+    :return:
+    """
     # type: (AnalyzedApk, Analysis) -> AnalyzedApk
 
     # Get base path of permcrawl.py for loading the json files
     base_path = os.path.dirname(os.path.realpath(sys.argv[0]))
 
     # Load the permission-sdk-map and the permission-framework map from the resp. json files as dicts
-    # Take car of the used workaround for circumventing Androguard's lack of target SDK 26 and above
-    if apk.target_sdk > 25:
+    # Take care of the used workaround for circumventing Androguard's lack of target SDK 26 and above, we simply
+    # handle SDK versions above 25 like 25 (shadow_target_sdk)
+    if analyzed_apk.target_sdk > 25:
         shadow_target_sdk = 25
     else:
-        shadow_target_sdk = apk.target_sdk
+        shadow_target_sdk = analyzed_apk.target_sdk
 
+    # Load the SDK map according to the (shadow) target SDK
     with open(base_path + "/AnalysisUtils/"
               "API_Res/perm-sdk-map-api" + str(shadow_target_sdk) + ".json",  "r") as sdk_dict:
         perm_sdk_map = json.load(sdk_dict)
@@ -244,6 +280,7 @@ def run_usage_analysis(apk, analysis):
     if not perm_sdk_map:
         raise Exception("Could not load the permission-sdk mapping for API " + str(shadow_target_sdk))
 
+    # Load the framework map according to the (shadow) target SDK
     with open(base_path + "/AnalysisUtils/API_Res/perm-framework-map-api" + str(shadow_target_sdk) + ".json", "r") \
             as framework_dict:
         perm_framework_map = json.load(framework_dict)
@@ -251,6 +288,7 @@ def run_usage_analysis(apk, analysis):
     if not perm_framework_map:
         raise Exception("Could not load the permission-framework mapping for API " + str(shadow_target_sdk))
 
+    # Load the ContentProvider map according to the (shadow) target SDK
     with open(base_path + "/AnalysisUtils/API_Res/ContentProvider/perm-provider-map23.json",  "r") \
             as provider_dict:
         perm_provider_map = json.load(provider_dict)
@@ -260,21 +298,23 @@ def run_usage_analysis(apk, analysis):
 
     usages = []
 
-    for permission in apk.requested_permissions_from_manifest:
+    # For each permission execute the SDK and framework UsageAnalysis
+    for permission in analyzed_apk.requested_permissions_from_manifest:
 
         logging.debug("Analyzing usages of SDK permissions...")
         usages += analyze_usage(analysis, permission, perm_sdk_map)
         logging.debug("Analyzing usages of framework permissions...")
         usages += analyze_usage(analysis, permission, perm_framework_map)
 
+    # For Providers all permissions are handled in the method that executes the Provider UsageAnalysis
     logging.info("Analyzing usages of provider permissions")
-    usages += analyze_provider_usages(analysis, apk.requested_permissions_from_manifest, perm_provider_map)
+    usages += analyze_provider_usages(analysis, analyzed_apk.requested_permissions_from_manifest, perm_provider_map)
     logging.info("Finished usage analysis.")
 
-    apk.analyzed_usages = usages
+    analyzed_apk.analyzed_usages = usages
 
     sdk_dict.close()
     framework_dict.close()
     provider_dict.close()
 
-    return apk
+    return analyzed_apk

@@ -5,8 +5,16 @@ from re import escape
 class RequestAnalysis:
 
     def __init__(self, permission, method, path, caller=None, reason=""):
+        """
+        Creates a RequestAnalysis instance from the given permission, callee and caller
 
-        # Creates a RequestAnalysis instance from the given permission, callee and caller
+        :param permission: The string representation of the requested permission
+        :param method: the method that requests the permission (one alternative of the several "requestPermissions"
+                        methods
+        :param path: The backtraced path to a main activity if available
+        :param caller: The method that calls "requestPermissions"
+        :param reason: Log message for unidentifyable requests (testing only)
+        """
         # type: (str, EncodedMethod, EncodedMethod) -> ()
 
         self.permission = permission
@@ -18,11 +26,17 @@ class RequestAnalysis:
 
         self.path = path
 
+        # List of identified explanations if available
         self.explanation = []
 
         return
 
     def __eq__(self, other):
+        """
+        Equality check needed to avoid duplicates
+        :param other:
+        :return:
+        """
         if not isinstance(other, self.__class__):
             return False
         return (self.permission == other.permission and
@@ -37,13 +51,20 @@ class RequestAnalysis:
 
     @classmethod
     def from_json(cls, analysis, req_analysis_json):
-
-        # Creates a RequestAnalysis instance from the given json dictionary
+        """
+        Creates a RequestAnalysis instance from the given json dictionary
+        Note that this method only was used for testing reasons and that the EvalUtils work directly with JSON
+        representations
+        :param analysis: Androguard Analysis instance of the app to analyze
+        :param req_analysis_json: The JSON representation of a RequestAnalysis
+        :return: An fully initialized RequestAnalysis instance
+        """
         # type: (RequestAnalysis, Analysis, dict) -> (RequestAnalysis)
 
         perm = req_analysis_json["permission"]
 
         # Use the information in the json dict to find the methods
+        # Load the ContentProvider map according to the (shadow) target SDK
 
         ma_gen = analysis.find_methods(classname=escape(req_analysis_json["method"]["class_name"]),
                                        methodname=escape(req_analysis_json["method"]["name"]),
@@ -104,6 +125,10 @@ class RequestAnalysis:
         return req
 
     def __repr__(self):
+        """
+
+        :return: A formatted basic string representation of this permission request
+        """
         out = "Permission %s requested at:\n" % self.permission
         out += "%s->%s%s [access_flags = %s]\n" % (self.method.get_class_name(),
                                                    self.method.get_name(),
@@ -136,6 +161,11 @@ class RequestAnalysis:
         return out
 
     def to_json(self, tab):
+        """
+        Creates a json representation of this permission request to persist analysis results
+        :param tab: For better readability of the created JSON files this int can be used to prepend a number of TABs
+        :return:
+        """
         # Tab parameter simply for formatting
         # Output is formatted for optimal readability
         json_out = "\t"*tab + "{\n"

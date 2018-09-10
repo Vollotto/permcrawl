@@ -8,7 +8,14 @@ class UsageAnalysis:
 
     def __init__(self, permission="Unknown Permission", method=None, path=None, analyzable=False,
                  reason="Usage not found"):
+        """
+        Creates a RequestAnalysis instance from the given permission and method
 
+        :param permission: The string representation of the requested permission
+        :param method: the method where the permission is used
+        :param path: The backtraced path to "onRequestPermissionsResult" if available
+        :param reason: Log message for unidentifyable usages (testing only)
+        """
         self.permission = permission  # type: str
         self.method = method  # type: EncodedMethod
         self.path = path  # type: List[EncodedMethod]
@@ -20,6 +27,11 @@ class UsageAnalysis:
             self.reason = ""
 
     def __eq__(self, other):
+        """
+        Equality check needed to avoid duplicates in UsageAnalysis
+        :param other:
+        :return:
+        """
         if not isinstance(other, self.__class__):
             return False
         return (self.permission == other.permission and
@@ -87,7 +99,9 @@ class UsageAnalysis:
             return cls(permission=perm, reason=usage_analysis_json["reason"].replace("\\\"", "\"").replace("\\n", "\n"))
 
     def __repr__(self):
-
+        """
+        :return: A basic String representation of this usage analysis
+        """
         if self.analyzable:
             out = "Permission \"%s\" is used at:\n" % self.permission
             out += "%s->%s%s [access_flags = %s]\n" % (self.method.get_class_name(),
@@ -110,7 +124,13 @@ class UsageAnalysis:
         return out
 
     def to_json(self, tab):
-
+        """
+        Creates a json representation of this permission usage to persist analysis results
+        :param tab: For better readability of the created JSON files this int can be used to prepend a number of TABs
+        :return:
+        """
+        # Tab parameter simply for formatting
+        # Output is formatted for optimal readability
         json_out = "\t"*tab + "{\n"
         json_out += "\t"*tab + "\t\"permission\" : \"%s\",\n" % self.permission
 
@@ -144,6 +164,7 @@ class UsageAnalysis:
             json_out += "\t"*tab + "\t]\n"
 
         else:
+            # reason for unknown usages
             json_out += "\t"*tab + "\t\"reason\" : %s" % json.dumps(self.reason)
 
         json_out += "\t"*tab + "}"

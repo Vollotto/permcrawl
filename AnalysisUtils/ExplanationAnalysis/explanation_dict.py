@@ -1,3 +1,9 @@
+'''
+Contains a list of basic permission-related terms and permission-specific keyword lists
+
+Specific keyword lists can be queried by referencing
+    perm_specific_terms[<permission name>]
+'''
 basic_terms = [
     "access",
     "permission",

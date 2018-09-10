@@ -30,7 +30,17 @@ class AnalyzedApk:
 
     @classmethod
     def from_json(cls, analysis, json_dict):
-        # Creates a AnalyzedApk instance from the given json dictionary
+        """
+        Creates a AnalyzedApk instance from the given json dictionary
+
+        *** NOTE: This method has only been used for testing purposes,
+                    for the final release we circumvented using the Analysis class once again and only worked with
+                    the JSON dicts, see EvalUtils package
+
+        :param analysis: Androguards analysis class
+        :param json_dict: A json representation of an AnalyzedAPK instance
+        :return: An initialized AnalyzedAPK instance
+        """
         # type: (AnalyzedApk, Analysis, dict) -> (AnalyzedApk)
 
         apk = cls()
@@ -56,9 +66,18 @@ class AnalyzedApk:
         return apk
 
     def is_analyzable(self):
+        """
+        Indicates whether the app is suitable for analysis
+
+        :return: True, if the app's target SDK is greater or equeal 23 AND the app declares <uses-permission> entries
+        for system permissions in its manifest AND there didn't occur an error during analysis
+        """
         return not (self.target_sdk_too_low or self.no_permission_declared or self.error)
 
     def __repr__(self):
+        """
+        :return: A basic formatted string representation of the analysis results
+        """
         if self.is_analyzable():
             out = "App %s:%s is analyzable\n" % (self.package_name, self.app_name)
 
@@ -90,6 +109,10 @@ class AnalyzedApk:
         return out
 
     def to_json(self):
+        """
+        Exports the analysis results into a JSON representation, can be used for persisting results
+        :return: The JSON representation of this instance
+        """
         json_out = "{\n"
 
         json_out += "\t\"app_name\" : \"%s\",\n" % self.app_name
@@ -97,24 +120,30 @@ class AnalyzedApk:
         json_out += "\t\"apk_path\" : \"%s\",\n" % self.apk_path
         json_out += "\t\"target_sdk\" : %d,\n" % self.target_sdk
 
+        # use dumps for boolean values
         json_out += "\t\"target_sdk_too_low\" : %s,\n" % json.dumps(self.target_sdk_too_low)
         json_out += "\t\"no_permission\" : %s,\n" % json.dumps(self.no_permission_declared)
         json_out += "\t\"error\" : %s,\n" % json.dumps(self.error)
 
+        # list of used permissions
         json_out += "\t\"permissions_from_manifest\" : [\n"
 
+        # Keep order in instance by using a counter
         for i in range(0, len(self.requested_permissions_from_manifest)):
             json_out += "\t\t\"%s\"" % self.requested_permissions_from_manifest[i]
 
+            # Separate list correctly
             if i < len(self.requested_permissions_from_manifest) - 1:
                 json_out += ","
             json_out += "\n"
 
         json_out += "\t],\n"
 
+        # create list of JSON representations of RequestAnalysisResult objects
         json_out += "\t\"analyzed_requests\" : [\n"
 
         for i in range(0, len(self.analyzed_requests)):
+            # 2 is the number of TABs used for human readability
             json_out += self.analyzed_requests[i].to_json(2)
 
             if i < len(self.analyzed_requests) - 1:
@@ -123,9 +152,11 @@ class AnalyzedApk:
 
         json_out += "\t],\n"
 
+        # Same for the UsageAnalysisResult objects
         json_out += "\t\"analyzed_usages\" : [\n"
 
         for i in range(0, len(self.analyzed_usages)):
+            # Again TABs for readability
             json_out += self.analyzed_usages[i].to_json(2)
 
             if i < len(self.analyzed_usages) - 1:

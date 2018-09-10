@@ -5,6 +5,12 @@ from androguard.core.api_specific_resources import load_permissions
 
 
 def init_basic_infos(apk, analyzed_apk):
+    """
+    Extracts some basic information from the given APK object and initializes those infos in an :class:`~analysis_result.AnalyzedApk` instance
+    :param apk: An Androguard APK instance
+    :param analyzed_apk: The result of the whole analysis as instance of :class:`~analysis_result.AnalyzedApk`
+    :return: The initialized instance of :class:`~analysis_result.AnalyzedApk`
+    """
     # type: (APK, AnalyzedApk) -> AnalyzedApk
 
     logging.debug("Extracting basic app information...")
@@ -24,6 +30,12 @@ def init_basic_infos(apk, analyzed_apk):
 
 
 def filter_target_sdk(apk, analyzed_apk):
+    """
+    Checks if the target SDK version of the given APK is suitble (>= 23)
+    :param apk: An Androguard APK instance
+    :param analyzed_apk: The result of the whole analysis as instance of :class:`~analysis_result.AnalyzedApk`
+    :return: The initialized instance of :class:`~analysis_result.AnalyzedApk`
+    """
     # type: (APK, AnalyzedApk) -> AnalyzedApk
 
     try:
@@ -44,11 +56,18 @@ def filter_target_sdk(apk, analyzed_apk):
 
 
 def filter_manifest_permission_requests(apk, analyzed_apk):
+    """
+    Initializes the requested permissions from the manifest of the app to analyze
+    :param apk: An Androguard APK instance
+    :param analyzed_apk: The result of the whole analysis as instance of :class:`~analysis_result.AnalyzedApk`
+    :return: The initialized instance of :class:`~analysis_result.AnalyzedApk`
+    """
     # type: (APK, AnalyzedApk) -> AnalyzedApk
 
     # initialize dictionary for permissions
     logging.info("Loading dictionary for permissions...")
 
+    # Androguard only supports SDK versions lower until 25
     if analyzed_apk.target_sdk > 25:
         perms = load_permissions(25)
     else:
